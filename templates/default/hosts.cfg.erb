@@ -13,7 +13,6 @@ define host {
 <% @nodes.each do |n| -%>
 <% unless n.name == node.name -%>
 define host {
-  use server
   <% # because nodes may not include the nagios cookbook, host_template
      # may be undefined, so we default to 'server' %>
   use <%=  (n['nagios'] && n['nagios']['host_template']) || 'server' %>
@@ -22,9 +21,9 @@ define host {
   host_name <%= node['nagios']['server']['normalize_hostname'] ? host_name.downcase : host_name %>
   <% if node['nagios']['multi_environment_monitoring'] -%>
   <% if n['roles'].nil? || n['roles'].length == 0 -%>
-  hostgroups all,<%= n['os'] %>, <%= n.chef_environment %>
+  hostgroups all,<%= n['os'] %>,<%= n.chef_environment %>
   <% else -%>
-  hostgroups all,<%= (n['roles'] & @hostgroups).sort.join(",") %>,<%= n['os'] %>, <%= n.chef_environment %>
+  hostgroups all,<%= (n['roles'] & @hostgroups).sort.join(",") %>,<%= n['os'] %>,<%= n.chef_environment %>
   <% end -%>
   <% elsif -%>
   <% if n['roles'].nil? || n['roles'].length == 0 -%>
